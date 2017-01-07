@@ -24,6 +24,7 @@ class VideoList : UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        UIApplication.shared.setStatusBarHidden(true, with: .none)        
         appendWithoutAddingDuplicates(videos: try! FileManager.default.contentsOfDirectory(atPath: Literals.rootDirectory.path))
         videoTable.reloadData()
     }
@@ -44,6 +45,8 @@ class VideoList : UIViewController {
         }
         return video == ".DS_Store"
     }
+    
+    
 }
 
 extension VideoList : UITableViewDelegate {
@@ -57,14 +60,14 @@ extension VideoList : UITableViewDelegate {
     }
     
     private func initVideoPlayer(_ name: String) {
-        let url = Literals.rootDirectory.appendingPathComponent(name)
         let player = AVPlayerViewController()
-        player.player = AVPlayer(url: url)
-        present(player, animated: true) { 
+        player.player = AVPlayer(url: Literals.rootDirectory.appendingPathComponent(name))
+        present(player, animated: true) {
             player.player!.play()
         }
     }
 }
+
 
 extension VideoList : UITableViewDataSource {
     

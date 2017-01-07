@@ -35,3 +35,12 @@ extension UITabBarItem {
     }
 }
 
+class UI {
+    public class func addShadow(_ view: UIView) {
+        
+        view.layer.shadowColor = UIColor.darkGray.cgColor
+        view.layer.shadowOpacity = 0.7
+        view.layer.shadowRadius = 2
+        view.layer.shadowOffset = CGSize(width: 0, height: 3)
+    }
+}
