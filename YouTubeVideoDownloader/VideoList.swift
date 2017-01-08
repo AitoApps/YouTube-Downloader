@@ -103,6 +103,10 @@ extension VideoList : UITableViewDataSource {
         return videos.count
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 75
+    }
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -110,7 +114,8 @@ extension VideoList : UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "VideoCell") as! VideoCell
         let video = videos[indexPath.row]
-        cell.textLabel!.text = video
+        cell.titleLabel!.text = video.replacingOccurrences(of: ".mp4", with: "")
+        cell.videoImage.image = UI.firstFrame(url: URL(fileURLWithPath: Literals.rootDirectory.appendingPathComponent(video).path))
         
         if FileManager.default.fileExists(atPath: Literals.rootDirectory.appendingPathComponent(video).path) {
             cell.downloadedState()
@@ -175,9 +180,11 @@ extension VideoList : YouTubeViewerDelegate {
 class VideoCell : UITableViewCell {
     @IBOutlet weak var progressBar: UIProgressView!
     @IBOutlet weak var percentageLabel: UILabel!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var videoImage: UIImageView!
     
     public func downloadState() {
-        textLabel!.alpha = 0.4
+        titleLabel!.alpha = 0.4
         percentageLabel.isHidden = false
         progressBar.isHidden = false
     }
@@ -185,6 +192,6 @@ class VideoCell : UITableViewCell {
     public func downloadedState() {
         percentageLabel.isHidden = true
         progressBar.isHidden = true
-        textLabel!.alpha = 1
+        titleLabel!.alpha = 1
     }
 }

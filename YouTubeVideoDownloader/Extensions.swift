@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import AVKit
+import AVFoundation
 import UIKit
 
 public let isIpad = UI_USER_INTERFACE_IDIOM() == .pad
@@ -43,4 +45,13 @@ class UI {
         view.layer.shadowRadius = 2
         view.layer.shadowOffset = CGSize(width: 0, height: 3)
     }
+    
+    public class func firstFrame(url: URL) -> UIImage {
+        let generator = AVAssetImageGenerator(asset: AVURLAsset(url: url))
+        generator.appliesPreferredTrackTransform = true
+        if let image = try? UIImage(cgImage: generator.copyCGImage(at: CMTime(seconds: 30, preferredTimescale: 1), actualTime: nil)) {
+            return image
+        }
+        return UIImage()
+    }    
 }

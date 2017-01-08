@@ -71,27 +71,23 @@ class YouTubeViewer: UIViewController {
     }
     
     @objc private func downloadTapped() {
-        if webView.url != nil && webView.url!.absoluteString.contains("watch?v=") {
-            
-            webView.evaluateJavaScript("document.documentElement.outerHTML.toString()",
-                                       completionHandler: { (html: Any?, error: Error?) in
-                                        print(html)
-            })
-            
-            YouTubeDownloader.getDirectLink(fromYoutubeUrl: webView.url!, completionHandler: { (url) in
-                if url != nil {
-                    self.initDownload(url: url!)
-                }else {
-                    print("Couldn't fetch link")
+        if webView.url != nil && webView.url!.absoluteString.contains("watch?v=") {            
+            webView.evaluateJavaScript("document.documentElement.outerHTML.toString()", completionHandler: { (html: Any?, error: Error?) in
+                if html == nil { return }
+                if let url = YouTubeScraper.getDirectLink(fromPageSource: html as! String) {
+                    self.initDownload(url: url, name: YouTubeScraper.getVideoTitle(fromPageSource: html as! String))
                 }
             })
+            
         }else {
             UIAlertView(title: "Error", message: "Please click on a YouTube Video before trying to download.", delegate: nil, cancelButtonTitle: "OK").show()
         }
     }
 
-    private func initDownload(url: URL) {
-        let path = Literals.rootDirectory.appendingPathComponent("video\(arc4random_uniform(1000000)).mp4")
+    private func initDownload(url: URL, name: String?) {
+        let videoName = (name ?? "video\(arc4random_uniform(1000000))") + ".mp4" 
+        let path = Literals.rootDirectory.appendingPathComponent(videoName)
+        print(path)
         delegate?.downloadDidBegin(name: path.lastPathComponent)
         let notificationView = YTNotificationView(text: "Video has been added to downloads!")
         view.addSubview(notificationView)

@@ -34,8 +34,7 @@ fileprivate extension UIView {
         for subview in subviews {
             if String(describing: subview).contains("AVButton") {                
                 tapCount += 1
-                if tapCount == 4 { //tap only the 4th button
-                    print(subview)
+                if tapCount == 4 { //tap only the 4th button                    
                     (subview as! UIButton).sendActions(for: .touchUpInside)
                 }
             }
