@@ -18,7 +18,7 @@ public struct Literals {
 }
 
 protocol YouTubeViewerDelegate {
-    func downloadDidBegin(name: String)
+    func downloadDidBegin(name: String, image: UIImage)
     func didReturnCurrentDownload(progress: Double, _ name: String)
 }
 
@@ -66,7 +66,7 @@ class YouTubeViewer: UIViewController {
     
     @objc private func blockAvPlayerViewControllerAutoPlay() {
         if UIApplication.shared.windows.count > 1 && UIApplication.shared.windows[1].isHidden == false {
-            AVPlayerBlocker.defaultBlocker.blockAvPlayer() //prevent AVPlayerFrom AutoPlaying
+            AVPlayerBlocker().blockAvPlayer() //prevent AVPlayerFrom AutoPlaying
         }
     }
     
@@ -75,7 +75,7 @@ class YouTubeViewer: UIViewController {
             webView.evaluateJavaScript("document.documentElement.outerHTML.toString()", completionHandler: { (html: Any?, error: Error?) in
                 if html == nil { return }
                 if let url = YouTubeScraper.getDirectLink(fromPageSource: html as! String) {
-                    self.initDownload(url: url, name: YouTubeScraper.getVideoTitle(fromPageSource: html as! String))
+                    self.initDownload(url: url, name: YouTubeScraper.getVideoTitle(fromPageSource: html as! String), image: YouTubeScraper.getThumbnailImage(fromPageSource: html as! String) ?? UIImage())                    
                 }
             })
             
@@ -84,11 +84,12 @@ class YouTubeViewer: UIViewController {
         }
     }
 
-    private func initDownload(url: URL, name: String?) {
+    private func initDownload(url: URL, name: String?, image: UIImage) {
         let videoName = (name ?? "video\(arc4random_uniform(1000000))") + ".mp4" 
         let path = Literals.rootDirectory.appendingPathComponent(videoName)
         print(path)
-        delegate?.downloadDidBegin(name: path.lastPathComponent)
+        
+        delegate?.downloadDidBegin(name: path.lastPathComponent, image: image)
         let notificationView = YTNotificationView(text: "Video has been added to downloads!")
         view.addSubview(notificationView)
         Alamofire.download(url, method: .get, encoding: URLEncoding.default) { (destroy_stage, response) -> (destinationURL: URL, options: DownloadRequest.DownloadOptions) in

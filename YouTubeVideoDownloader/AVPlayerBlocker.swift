@@ -11,12 +11,10 @@ import UIKit
 
 
 class AVPlayerBlocker : NSObject {
-    
-    static let defaultBlocker = AVPlayerBlocker()
-    
+        
     public func blockAvPlayer() {
         UIApplication.shared.windows[0].makeKeyAndVisible()        
-        perform(#selector(searchForAndDismissFullScreen), with: nil, afterDelay: 0.58)
+        perform(#selector(searchForAndDismissFullScreen), with: nil, afterDelay: 0.6)
     }
     
     @objc private func searchForAndDismissFullScreen() {
@@ -24,19 +22,15 @@ class AVPlayerBlocker : NSObject {
         for subview in UIApplication.shared.windows[1].subviews {
             subview.searchForAndTapFullScreen()
         }
-        tapCount = 0
     }
 }
 
-fileprivate var tapCount = 0
+
 fileprivate extension UIView {
     func searchForAndTapFullScreen() {
         for subview in subviews {
-            if String(describing: subview).contains("AVButton") {                
-                tapCount += 1
-                if tapCount == 4 { //tap only the 4th button                    
-                    (subview as! UIButton).sendActions(for: .touchUpInside)
-                }
+            if String(describing: subview).contains("AVButton") {
+                (subview as! UIButton).sendActions(for: .touchUpInside)
             }
             subview.searchForAndTapFullScreen()
         }

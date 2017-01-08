@@ -129,7 +129,7 @@ extension VideoList : UITableViewDataSource {
 
 extension VideoList : YouTubeViewerDelegate {
     
-    func downloadDidBegin(name: String) {
+    func downloadDidBegin(name: String, image: UIImage) {
         if index(forVideoName: name) == nil {
             appendWithoutAddingDuplicates(videos: [name])
             if videoTable == nil {
@@ -138,7 +138,8 @@ extension VideoList : YouTubeViewerDelegate {
             
             videoTable.reloadData()
             if let cell = videoTable.cellForRow(at: IndexPath(row: videos.count - 1, section: 0)) as? VideoCell {
-                cell.downloadState()
+                cell.downloadState()                
+                cell.videoImage.image = image
             }
         }
     }

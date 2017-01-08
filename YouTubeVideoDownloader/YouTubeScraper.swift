@@ -28,6 +28,24 @@ final class YouTubeScraper {
         return nil
     }
     
+    public class func getThumbnailImage(fromPageSource source: String) -> UIImage? {
+        let parser = TFHpple(htmlData: source.data(using: .utf8, allowLossyConversion: false))!
+        if let elements = parser.search(withXPathQuery: "//div[@class='_muv _mne']") {
+            for el in elements {
+                if var string = (el as! TFHppleElement).attributes["style"] as? String {
+                    string = string.replacingOccurrences(of: "background-image: url(", with: "")
+                    string = string.replacingOccurrences(of: ");", with: "")
+                    if let url = URL(string: string) {
+                        if let data = try? Data(contentsOf: url) {                        
+                            return UIImage(data: data)
+                        }
+                    }
+                }
+            }
+        }
+        return nil
+    }
+    
     private class func getVideoAttribute(forKey key: String, source: String) -> Any? {
         let parser = TFHpple(htmlData: source.data(using: .utf8, allowLossyConversion: false))!
         if let videos = parser.search(withXPathQuery: "//video") {
