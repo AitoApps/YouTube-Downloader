@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		003B58513F4447A7C4717EAE /* Pods_YouTubeVideoDownloader.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A17ECA69C51D506D57B67790 /* Pods_YouTubeVideoDownloader.framework */; };
 		3E4BF9D61E21A07900D76459 /* YTNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E4BF9D51E21A07900D76459 /* YTNotificationView.swift */; };
+		3E81F3011E2ABE6000CD81D1 /* WKTrafficManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E81F3001E2ABE6000CD81D1 /* WKTrafficManager.swift */; };
 		3ED95E141E1A7F4200E9605C /* YouTubeTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED95E131E1A7F4200E9605C /* YouTubeTabBarController.swift */; };
 		3EEB151F1E1B2255006A8ABB /* AVPlayerBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EEB151E1E1B2255006A8ABB /* AVPlayerBlocker.swift */; };
 		3EEEC9501E19B4AF00CFD428 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EEEC94F1E19B4AF00CFD428 /* AppDelegate.swift */; };
@@ -42,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		3E4BF9D51E21A07900D76459 /* YTNotificationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YTNotificationView.swift; sourceTree = "<group>"; };
+		3E81F3001E2ABE6000CD81D1 /* WKTrafficManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKTrafficManager.swift; sourceTree = "<group>"; };
 		3ED95E131E1A7F4200E9605C /* YouTubeTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YouTubeTabBarController.swift; sourceTree = "<group>"; };
 		3EEB151E1E1B2255006A8ABB /* AVPlayerBlocker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVPlayerBlocker.swift; sourceTree = "<group>"; };
 		3EEEC94C1E19B4AF00CFD428 /* YouTubeVideoDownloader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YouTubeVideoDownloader.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -115,6 +117,7 @@
 				3EEEC97F1E19D53900CFD428 /* YouTubeScraper.swift */,
 				3EEB151E1E1B2255006A8ABB /* AVPlayerBlocker.swift */,
 				3E4BF9D51E21A07900D76459 /* YTNotificationView.swift */,
+				3E81F3001E2ABE6000CD81D1 /* WKTrafficManager.swift */,
 			);
 			name = Utility;
 			sourceTree = "<group>";
@@ -386,6 +389,7 @@
 				3EEEC9821E19D91400CFD428 /* VideoList.swift in Sources */,
 				3EEEC9521E19B4AF00CFD428 /* YouTubeViewer.swift in Sources */,
 				3ED95E141E1A7F4200E9605C /* YouTubeTabBarController.swift in Sources */,
+				3E81F3011E2ABE6000CD81D1 /* WKTrafficManager.swift in Sources */,
 				3EEEC9501E19B4AF00CFD428 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

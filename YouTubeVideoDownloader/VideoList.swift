@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import AVKit
 import AVFoundation
+import AssetsLibrary
 
 class VideoList : UIViewController {
     
@@ -19,7 +20,41 @@ class VideoList : UIViewController {
         didSet {
             videoTable.delegate = self
             videoTable.dataSource = self
+            let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gestureRecognizer:)))
+            videoTable.addGestureRecognizer(longPressRecognizer)
         }
+    }
+    
+    @objc private func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
+        if gestureRecognizer.state == .began {
+            if let indexPath = videoTable.indexPathForRow(at: gestureRecognizer.location(in: videoTable)) {
+                if (videoTable.cellForRow(at: indexPath) as! VideoCell).progressBar.isHidden {
+                    presentAlert(indexPath: indexPath)
+                }
+            }
+        }
+    }
+    
+    private func presentAlert(indexPath: IndexPath) {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Save To Camera Roll", style: .default) { (_) in
+            let path = Literals.rootDirectory.appendingPathComponent(self.videos[indexPath.row]).path
+            if !UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(path) { return }
+            
+            ALAssetsLibrary().writeVideoAtPath(toSavedPhotosAlbum: URL(fileURLWithPath: path), completionBlock: { (url, error) -> Void in
+                if error == nil {
+                    UIAlertView(title: "Saved To Camera Roll", message: nil, delegate: nil, cancelButtonTitle: "OK").show()
+                }
+            })
+        })
+        
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { (_) in
+            self.deleteVideo(indexPath)
+        })
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -75,15 +110,26 @@ extension VideoList : UITableViewDataSource {
         return "Place Holder Foo"
     }
     
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        if let cell = (tableView.cellForRow(at: indexPath) as? VideoCell) {
+            return cell.progressBar.isHidden
+        }
+        return false
+    }
+    
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            do {
-                try FileManager.default.removeItem(at: Literals.rootDirectory.appendingPathComponent(videos[indexPath.row]))
-                videos.remove(at: indexPath.row)
-                tableView.deleteRows(at: [indexPath], with: .left)
-            }catch {
-                UIAlertView(title: "Error", message: "Couldn't Delete File", delegate: nil, cancelButtonTitle: "OK")
-            }
+            deleteVideo(indexPath)
+        }
+    }
+    
+    fileprivate func deleteVideo(_ indexPath: IndexPath) {
+        do {
+            try FileManager.default.removeItem(at: Literals.rootDirectory.appendingPathComponent(videos[indexPath.row]))
+            videos.remove(at: indexPath.row)
+            videoTable.deleteRows(at: [indexPath], with: .left)
+        }catch {
+            UIAlertView(title: "Error", message: "Couldn't Delete File", delegate: nil, cancelButtonTitle: "OK").show()
         }
     }
     
@@ -115,7 +161,18 @@ extension VideoList : UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "VideoCell") as! VideoCell
         let video = videos[indexPath.row]
         cell.titleLabel!.text = video.replacingOccurrences(of: ".mp4", with: "")
-        cell.videoImage.image = UI.firstFrame(url: URL(fileURLWithPath: Literals.rootDirectory.appendingPathComponent(video).path))
+        if let image = UI.firstFrame(url: URL(fileURLWithPath: Literals.rootDirectory.appendingPathComponent(video).path)) {
+            cell.videoImage.image = image
+        }else if cell.imgUrl != nil {
+            DispatchQueue.global(qos: .background).async {
+                if let data = try? Data(contentsOf: cell.imgUrl!) {
+                    DispatchQueue.main.async {
+                        cell.videoImage.image = UIImage(data: data)
+                    }
+                }
+            }
+            
+        }
         
         if FileManager.default.fileExists(atPath: Literals.rootDirectory.appendingPathComponent(video).path) {
             cell.downloadedState()
@@ -129,7 +186,7 @@ extension VideoList : UITableViewDataSource {
 
 extension VideoList : YouTubeViewerDelegate {
     
-    func downloadDidBegin(name: String, image: UIImage) {
+    func downloadDidBegin(name: String, url: URL) {
         if index(forVideoName: name) == nil {
             appendWithoutAddingDuplicates(videos: [name])
             if videoTable == nil {
@@ -138,8 +195,8 @@ extension VideoList : YouTubeViewerDelegate {
             
             videoTable.reloadData()
             if let cell = videoTable.cellForRow(at: IndexPath(row: videos.count - 1, section: 0)) as? VideoCell {
-                cell.downloadState()                
-                cell.videoImage.image = image
+                cell.imgUrl = url
+                cell.downloadState()
             }
         }
     }
@@ -156,7 +213,6 @@ extension VideoList : YouTubeViewerDelegate {
                 }
             }
         }
-        
     }
     
     @objc private func fadeOut(cell: VideoCell) {
@@ -183,6 +239,8 @@ class VideoCell : UITableViewCell {
     @IBOutlet weak var percentageLabel: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var videoImage: UIImageView!
+    
+    public var imgUrl : URL? 
     
     public func downloadState() {
         titleLabel!.alpha = 0.4

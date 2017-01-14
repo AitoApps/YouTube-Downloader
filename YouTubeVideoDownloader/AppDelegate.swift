@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import WKWebViewWithURLProtocol
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,7 +17,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        application.setStatusBarHidden(true, with: .none)        
+        application.setStatusBarHidden(true, with: .none)
+        
+        URLProtocol.wk_registerScheme("http")
+        URLProtocol.wk_registerScheme("https")
+        URLProtocol.registerClass(WKTrafficManager.self)
         return true
     }
 

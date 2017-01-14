@@ -5,6 +5,7 @@ target ‘YouTubeVideoDownloader’ do
    
 pod 'Alamofire'
 pod 'TFHpple'
+pod 'WKWebViewWithURLProtocol'
 
 post_install do |installer|
     installer.pods_project.targets.each do |target|

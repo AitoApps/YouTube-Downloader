@@ -18,7 +18,7 @@ public struct Literals {
 }
 
 protocol YouTubeViewerDelegate {
-    func downloadDidBegin(name: String, image: UIImage)
+    func downloadDidBegin(name: String, url: URL)
     func didReturnCurrentDownload(progress: Double, _ name: String)
 }
 
@@ -26,14 +26,14 @@ class YouTubeViewer: UIViewController {
     
     public var delegate: YouTubeViewerDelegate?
     
-    fileprivate var webView: WKWebView! =  {
+    @objc fileprivate var webView: WKWebView! =  {
         let theWebView = WKWebView()
         theWebView.load(URLRequest(url: URL(string: "https://m.youtube.com/")!))
         return theWebView
     }()
     
-    fileprivate let downloadButton: UIButton! = {
-        let download = UIButton(type: .roundedRect)
+    fileprivate let downloadButton: WKButton! = {
+        let download = WKButton(type: .roundedRect)
         download.backgroundColor = .red
         download.setTitle("Download Video", for: .normal)
         download.setTitleColor(UIColor.white, for: .normal)
@@ -54,7 +54,9 @@ class YouTubeViewer: UIViewController {
         let f = view.frame
         webView.frame = CGRect(x: f.origin.x, y: f.origin.y, width: f.size.width, height: f.size.height - tabBarController!.tabBar.frame.size.height)
         webView.navigationDelegate = self
-        downloadButton.frame = CGRect(x: (f.size.width * 0.635) - 5, y: webView.frame.size.height -  (f.size.height * 0.065) - 5, width: f.size.width * 0.375, height: (f.size.height * 0.15) - tabBarController!.tabBar.frame.size.height)
+        downloadButton.defaultFrame = CGRect(x: (f.size.width * 0.635) - 5, y: webView.frame.size.height -  (f.size.height * 0.065) - 5, width: f.size.width * 0.375, height: (f.size.height * 0.15) - tabBarController!.tabBar.frame.size.height)
+        downloadButton.frame = downloadButton.defaultFrame
+        downloadButton.frame.origin.y = UIScreen.main.bounds.size.height
         downloadButton.addTarget(self, action: #selector(downloadTapped), for: .touchUpInside)
         downloadButton.layer.cornerRadius = 10
         webView.navigationDelegate = self
@@ -62,6 +64,28 @@ class YouTubeViewer: UIViewController {
         view.addSubview(downloadButton)
         view.addSubview(activityIndicator)
         NotificationCenter.default.addObserver(self, selector: #selector(blockAvPlayerViewControllerAutoPlay), name: .UIWindowDidResignKey, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(shouldShowButton), name: NSNotification.Name(rawValue: "shouldShowDownloadButton"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(shouldHideButton), name: NSNotification.Name(rawValue: "shouldHideDownloadButton"), object: nil)
+    }
+    
+    @objc private func shouldShowButton() {
+        if downloadButton.isVisible { return }
+        downloadButton.isVisible = true
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.4) {
+                self.downloadButton.frame = self.downloadButton.defaultFrame
+            }
+        }
+    }
+    
+    @objc private func shouldHideButton() {        
+        if !downloadButton.isVisible { return }
+        downloadButton.isVisible = false
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.4) {
+                self.downloadButton.frame.origin.y = UIScreen.main.bounds.size.height
+            }
+        }
     }
     
     @objc private func blockAvPlayerViewControllerAutoPlay() {
@@ -75,7 +99,7 @@ class YouTubeViewer: UIViewController {
             webView.evaluateJavaScript("document.documentElement.outerHTML.toString()", completionHandler: { (html: Any?, error: Error?) in
                 if html == nil { return }
                 if let url = YouTubeScraper.getDirectLink(fromPageSource: html as! String) {
-                    self.initDownload(url: url, name: YouTubeScraper.getVideoTitle(fromPageSource: html as! String), image: YouTubeScraper.getThumbnailImage(fromPageSource: html as! String) ?? UIImage())                    
+                    self.initDownload(url: url, name: YouTubeScraper.getVideoTitle(fromPageSource: html as! String), imgUrl: YouTubeScraper.getThumbnailImage(fromUrlString: self.webView.url!.absoluteString))
                 }
             })
             
@@ -84,12 +108,12 @@ class YouTubeViewer: UIViewController {
         }
     }
 
-    private func initDownload(url: URL, name: String?, image: UIImage) {
+    private func initDownload(url: URL, name: String?, imgUrl: URL) {
         let videoName = (name ?? "video\(arc4random_uniform(1000000))") + ".mp4" 
         let path = Literals.rootDirectory.appendingPathComponent(videoName)
         print(path)
         
-        delegate?.downloadDidBegin(name: path.lastPathComponent, image: image)
+        delegate?.downloadDidBegin(name: path.lastPathComponent, url: imgUrl)
         let notificationView = YTNotificationView(text: "Video has been added to downloads!")
         view.addSubview(notificationView)
         Alamofire.download(url, method: .get, encoding: URLEncoding.default) { (destroy_stage, response) -> (destinationURL: URL, options: DownloadRequest.DownloadOptions) in
@@ -101,9 +125,13 @@ class YouTubeViewer: UIViewController {
     
 }
 
+final class WKButton : UIButton {
+    public var isVisible: Bool = false
+    public var defaultFrame : CGRect = .zero
+}
+
 extension YouTubeViewer : WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         activityIndicator.removeFromSuperview()
     }
 }
-

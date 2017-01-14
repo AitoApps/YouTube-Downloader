@@ -27,13 +27,14 @@
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="exa-BS-ilN">
                                 <rect key="frame" x="-0.5" y="0.0" width="375" height="618"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="sectionIndexBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="VideoCell" rowHeight="75" id="I4H-Wh-p7M" customClass="VideoCell" customModule="YouTubeVideoDownloader" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="375" height="75"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="I4H-Wh-p7M" id="fiK-fH-4w5">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="74"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="74.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U4q-uA-bOl">
@@ -41,7 +42,7 @@
                                                     <color key="progressTintColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 </progressView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0%" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.29999999999999999" translatesAutoresizingMaskIntoConstraints="NO" id="ap7-pG-3OY">
-                                                    <rect key="frame" x="335.5" y="25" width="37.5" height="23.5"/>
+                                                    <rect key="frame" x="333.5" y="25" width="37.5" height="23.5"/>
                                                     <fontDescription key="fontDescription" name="Avenir-Book" family="Avenir" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -72,7 +73,7 @@
                                                 <constraint firstItem="ap7-pG-3OY" firstAttribute="centerY" secondItem="fiK-fH-4w5" secondAttribute="centerY" id="i7e-eI-ZUb"/>
                                                 <constraint firstItem="oWR-vs-iEl" firstAttribute="centerY" secondItem="KVq-7c-afL" secondAttribute="centerY" id="ixb-q0-XTQ"/>
                                                 <constraint firstItem="KVq-7c-afL" firstAttribute="leading" secondItem="fiK-fH-4w5" secondAttribute="leadingMargin" id="kFS-ZM-1Gu"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="ap7-pG-3OY" secondAttribute="trailing" constant="-6" id="tZO-0M-eBf"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="ap7-pG-3OY" secondAttribute="trailing" constant="-4" id="tZO-0M-eBf"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
@@ -85,7 +86,7 @@
                                 </prototypes>
                             </tableView>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="exa-BS-ilN" firstAttribute="centerX" secondItem="qmN-45-Q6z" secondAttribute="centerX" id="32r-vR-Vj8"/>
                             <constraint firstItem="exa-BS-ilN" firstAttribute="height" secondItem="qmN-45-Q6z" secondAttribute="height" id="KFE-fE-cY2"/>
@@ -94,9 +95,7 @@
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
-                    <tabBarItem key="tabBarItem" title="Downloads" image="Downloads" id="Fns-pq-JN3">
-                        <inset key="imageInsets" minX="1" minY="1" maxX="1" maxY="1"/>
-                    </tabBarItem>
+                    <tabBarItem key="tabBarItem" title="Downloads" image="Downloads" id="Fns-pq-JN3"/>
                     <nil key="simulatedStatusBarMetrics"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
@@ -121,9 +120,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
-                    <tabBarItem key="tabBarItem" title="YouTube" image="youtube" id="hKY-4B-Fg6">
-                        <inset key="imageInsets" minX="3" minY="3" maxX="3" maxY="3"/>
-                    </tabBarItem>
+                    <tabBarItem key="tabBarItem" title="YouTube" image="youtube" id="hKY-4B-Fg6"/>
                     <nil key="simulatedStatusBarMetrics"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="U1L-35-fnj" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -154,7 +151,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Downloads" width="30" height="30"/>
-        <image name="youtube" width="50" height="50"/>
+        <image name="Downloads" width="25" height="25"/>
+        <image name="youtube" width="30" height="30"/>
     </resources>
 </document>

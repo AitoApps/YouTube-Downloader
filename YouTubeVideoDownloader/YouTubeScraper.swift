@@ -28,22 +28,23 @@ final class YouTubeScraper {
         return nil
     }
     
-    public class func getThumbnailImage(fromPageSource source: String) -> UIImage? {
-        let parser = TFHpple(htmlData: source.data(using: .utf8, allowLossyConversion: false))!
-        if let elements = parser.search(withXPathQuery: "//div[@class='_muv _mne']") {
-            for el in elements {
-                if var string = (el as! TFHppleElement).attributes["style"] as? String {
-                    string = string.replacingOccurrences(of: "background-image: url(", with: "")
-                    string = string.replacingOccurrences(of: ");", with: "")
-                    if let url = URL(string: string) {
-                        if let data = try? Data(contentsOf: url) {                        
-                            return UIImage(data: data)
-                        }
-                    }
-                }
-            }
+    public class func getThumbnailImage(fromUrlString string: String) -> URL! {
+        return imgUrl(getId(string))
+    }
+    
+    private class func imgUrl(_ idString: String) -> URL {
+        let string = "https://img.youtube.com/vi/\(idString)/0.jpg"
+        if let url = URL(string: string) {
+            return url
         }
-        return nil
+        return URL(string: "https://learn.getgrav.org/user/pages/11.troubleshooting/01.page-not-found/error-404.png")!
+    }
+    
+    private class func getId(_ string: String) -> String {
+        guard let s = string.range(of: "watch?v=") else { return "JKYoutube Error: Not a valid YouTube URL" }
+        let u = string.range(of: "watch?v=")!.upperBound
+        let r = u..<string.endIndex
+        return string.substring(with: r)
     }
     
     private class func getVideoAttribute(forKey key: String, source: String) -> Any? {
