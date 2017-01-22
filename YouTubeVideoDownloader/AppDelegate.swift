@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 import WKWebViewWithURLProtocol
 
 @UIApplicationMain
@@ -22,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         URLProtocol.wk_registerScheme("http")
         URLProtocol.wk_registerScheme("https")
         URLProtocol.registerClass(WKTrafficManager.self)
+        try! AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
         return true
     }
 

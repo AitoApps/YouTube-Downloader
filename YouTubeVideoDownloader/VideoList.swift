@@ -81,7 +81,7 @@ class VideoList : UIViewController {
         return video == ".DS_Store"
     }
     
-    
+    fileprivate var currentPlayer : AVPlayer!
 }
 
 extension VideoList : UITableViewDelegate {
@@ -95,14 +95,35 @@ extension VideoList : UITableViewDelegate {
     }
     
     private func initVideoPlayer(_ name: String) {
-        let player = AVPlayerViewController()
-        player.player = AVPlayer(url: Literals.rootDirectory.appendingPathComponent(name))
-        present(player, animated: true) {
-            player.player!.play()
+        let videoPlayer = AVPlayerViewController()
+        currentPlayer = AVPlayer(url: Literals.rootDirectory.appendingPathComponent(name))
+        videoPlayer.player = currentPlayer
+        present(videoPlayer, animated: true) {
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: videoPlayer.player!.currentItem)
+            NotificationCenter.default.addObserver(self, selector: #selector(self.playerDidFinishPlaying),
+                                                   name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: videoPlayer.player!.currentItem)
+            videoPlayer.player!.play()
         }
     }
+    
+    @objc private func playerDidFinishPlaying(notification: NSNotification) {
+        let url = ((notification.object as! AVPlayerItem).asset as! AVURLAsset).url.lastPathComponent
+        currentPlayer.replaceCurrentItem(with: AVPlayerItem(url: Literals.rootDirectory.appendingPathComponent(videos[index(ofFile: url)])))
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: currentPlayer!.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.playerDidFinishPlaying),
+                                               name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: currentPlayer!.currentItem)
+        currentPlayer.play()
+    }
+    
+    private func index(ofFile file: String) -> Int {
+        for var i in 0..<videos.count {
+            if videos[i] == file {
+                return i + 1 >= videos.count ? 0 : i + 1
+            }
+        }
+        return 0
+    }
 }
-
 
 extension VideoList : UITableViewDataSource {
     

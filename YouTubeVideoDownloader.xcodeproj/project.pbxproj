@@ -267,6 +267,11 @@
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = WGS4W54952;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					3EEEC95F1E19B4AF00CFD428 = {
 						CreatedOnToolsVersion = 8.2.1;

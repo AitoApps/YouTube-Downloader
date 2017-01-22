@@ -121,6 +121,7 @@ class YouTubeViewer: UIViewController {
             }.downloadProgress { (progress) in
                 self.delegate?.didReturnCurrentDownload(progress: progress.fractionCompleted, path.lastPathComponent)
             }
+        
     }
     
 }
