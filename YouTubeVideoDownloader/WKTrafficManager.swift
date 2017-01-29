@@ -16,7 +16,7 @@ final class WKTrafficManager : URLProtocol {
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "shouldShowDownloadButton"), object: nil)
         }else if request.url!.absoluteString.contains("https://m.youtube.com/feed?") {
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "shouldHideDownloadButton"), object: nil)
-        }
+        }        
         return false
     }
     
@@ -25,5 +25,6 @@ final class WKTrafficManager : URLProtocol {
     }
     
     override func startLoading() {}
+    
     override func stopLoading() {}
 }

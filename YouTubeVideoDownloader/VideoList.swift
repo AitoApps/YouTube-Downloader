@@ -108,21 +108,23 @@ extension VideoList : UITableViewDelegate {
     
     @objc private func playerDidFinishPlaying(notification: NSNotification) {
         let url = ((notification.object as! AVPlayerItem).asset as! AVURLAsset).url.lastPathComponent
-        currentPlayer.replaceCurrentItem(with: AVPlayerItem(url: Literals.rootDirectory.appendingPathComponent(videos[index(ofFile: url)])))
+        currentPlayer.replaceCurrentItem(with: AVPlayerItem(url: Literals.rootDirectory.appendingPathComponent(nextVideo(fromFilename: url))))
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: currentPlayer!.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.playerDidFinishPlaying),
                                                name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: currentPlayer!.currentItem)
         currentPlayer.play()
     }
     
-    private func index(ofFile file: String) -> Int {
-        for var i in 0..<videos.count {
-            if videos[i] == file {
-                return i + 1 >= videos.count ? 0 : i + 1
+    private func nextVideo(fromFilename file: String) -> String {
+        let filtered = videos.filter({ FileManager.default.fileExists(atPath: Literals.rootDirectory.appendingPathComponent($0).path) })
+        for var i in 0..<filtered.count {
+            if filtered[i] == file {
+                return i + 1 >= filtered.count ? filtered[0] : filtered[i + 1]
             }
         }
-        return 0
+        return ""
     }
+    
 }
 
 extension VideoList : UITableViewDataSource {
