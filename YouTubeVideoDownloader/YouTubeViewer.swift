@@ -11,7 +11,6 @@ import WebKit
 import Alamofire
 
 //       - Prevent AutoPlaying in YouTube
-//       - Perhaps Figure out how to hide the download button? 
 
 public struct Literals {
     static let rootDirectory = URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!)
@@ -34,10 +33,15 @@ class YouTubeViewer: UIViewController {
     
     fileprivate let downloadButton: WKButton! = {
         let download = WKButton(type: .roundedRect)
-        download.backgroundColor = .red
         download.setTitle("Download Video", for: .normal)
-        download.setTitleColor(UIColor.white, for: .normal)
-        UI.addShadow(download)
+        
+        return download
+    }()
+    
+    fileprivate let youTubeButton: WKButton! = {
+        let download = WKButton(type: .roundedRect)
+        download.setImage(#imageLiteral(resourceName: "YouTube-1"), for: .normal)
+        download.imageView!.contentMode = .scaleAspectFit
         return download
     }()
     
@@ -58,14 +62,21 @@ class YouTubeViewer: UIViewController {
         downloadButton.frame = downloadButton.defaultFrame
         downloadButton.frame.origin.y = UIScreen.main.bounds.size.height
         downloadButton.addTarget(self, action: #selector(downloadTapped), for: .touchUpInside)
-        downloadButton.layer.cornerRadius = 10
+        youTubeButton.frame = CGRect(x: 5, y: downloadButton.defaultFrame.origin.y, width: downloadButton.frame.size.width * 0.6, height: downloadButton.frame.size.height)
+        youTubeButton.addTarget(self, action: #selector(loadHome), for: .touchUpInside)
         webView.navigationDelegate = self
         view.addSubview(webView)
         view.addSubview(downloadButton)
         view.addSubview(activityIndicator)
+        view.addSubview(youTubeButton)
         NotificationCenter.default.addObserver(self, selector: #selector(blockAvPlayerViewControllerAutoPlay), name: .UIWindowDidResignKey, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shouldShowButton), name: NSNotification.Name(rawValue: "shouldShowDownloadButton"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shouldHideButton), name: NSNotification.Name(rawValue: "shouldHideDownloadButton"), object: nil)
+        
+    }
+    
+    @objc private func loadHome() {
+        webView.load(URLRequest(url: URL(string: "https://m.youtube.com/")!))
     }
     
     @objc private func shouldShowButton() {
@@ -144,6 +155,13 @@ class YouTubeViewer: UIViewController {
 final class WKButton : UIButton {
     public var isVisible: Bool = false
     public var defaultFrame : CGRect = .zero
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        setTitleColor(UIColor.white, for: .normal)
+        backgroundColor = .red
+        layer.cornerRadius = 10
+        UI.addShadow(self)
+    }
 }
 
 extension YouTubeViewer : WKNavigationDelegate {
