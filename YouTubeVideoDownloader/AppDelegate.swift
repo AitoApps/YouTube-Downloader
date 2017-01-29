@@ -32,7 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillResignActive(_ application: UIApplication) {
         if let avVc = application.avPlayerViewController() {
-            avVc.toggleVideoOnAllTracks()
+            avVc.toggleVideoOnAllTracks(false)
         }
     }
     
@@ -46,13 +46,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {        
-        if let avVc = application.avPlayerViewController() {
-            avVc.toggleVideoOnAllTracks()
-        }
+        
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        if let avVc = application.avPlayerViewController() {
+            avVc.toggleVideoOnAllTracks(true)
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -79,14 +80,14 @@ fileprivate extension UIApplication {
 }
 
 fileprivate extension AVPlayerViewController {
-    func toggleVideoOnAllTracks() {
+    func toggleVideoOnAllTracks(_ enabled: Bool) {
         if UIApplication.shared.avPlayerViewController()!.player == nil
         || UIApplication.shared.avPlayerViewController()!.player!.currentItem == nil { return }
         
         let tracks = UIApplication.shared.avPlayerViewController()!.player!.currentItem!.tracks
         for track in tracks {
             if track.assetTrack.hasMediaCharacteristic(AVMediaCharacteristicVisual) {
-                track.isEnabled = !track.isEnabled
+                track.isEnabled = enabled
             }
         }
     }

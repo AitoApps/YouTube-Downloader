@@ -17,6 +17,14 @@ class VideoList : UIViewController {
     
     fileprivate var videos: [String] = []
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        MPRemoteCommandCenter.shared().nextTrackCommand.isEnabled = true
+        MPRemoteCommandCenter.shared().nextTrackCommand.addTarget(self, action:#selector(mediaPlayerNextButtonAction))
+        MPRemoteCommandCenter.shared().previousTrackCommand.isEnabled = true
+        MPRemoteCommandCenter.shared().previousTrackCommand.addTarget(self, action:#selector(mediaPlayerPreviousButtonAction))
+    }
+    
     @IBOutlet weak var videoTable: UITableView! {
         didSet {
             videoTable.delegate = self
@@ -65,11 +73,7 @@ class VideoList : UIViewController {
         videoTable.reloadData()
         
         // set up handle control center events
-        MPRemoteCommandCenter.shared().nextTrackCommand.isEnabled = true
-        MPRemoteCommandCenter.shared().nextTrackCommand.addTarget(self, action:#selector(mediaPlayerNextButtonAction))
-        MPRemoteCommandCenter.shared().previousTrackCommand.isEnabled = true
-        MPRemoteCommandCenter.shared().previousTrackCommand.addTarget(self, action:#selector(mediaPlayerNextButtonAction))
-
+        
     }
     
     func mediaPlayerNextButtonAction() {
@@ -124,20 +128,19 @@ extension VideoList : UITableViewDelegate {
             NotificationCenter.default.addObserver(self, selector: #selector(self.playerDidFinishPlaying),
                                                    name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: videoPlayer.player!.currentItem)
             videoPlayer.player!.play()
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = [MPMediaItemPropertyTitle : "foo bar foo"]
         }
     }
     
     @objc private func playerDidFinishPlaying(notification: NSNotification) {
         let url = ((notification.object as! AVPlayerItem).asset as! AVURLAsset).url.lastPathComponent
-        replaceVideo(nextVideo(fromFilename: url))
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: currentPlayer!.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.playerDidFinishPlaying),
-                                               name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: currentPlayer!.currentItem)
+        replaceVideo(nextVideo(fromFilename: url))        
     }
     
     fileprivate func replaceVideo(_ fileName: String) {
         currentPlayer.replaceCurrentItem(with: AVPlayerItem(url: Literals.rootDirectory.appendingPathComponent(fileName)))
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: currentPlayer!.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.playerDidFinishPlaying),
+                                               name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: currentPlayer!.currentItem)
         currentPlayer.play()
     }
     
@@ -155,7 +158,7 @@ extension VideoList : UITableViewDelegate {
         let filtered = videos.filter({ FileManager.default.fileExists(atPath: Literals.rootDirectory.appendingPathComponent($0).path) })
         for var i in 0..<filtered.count {
             if filtered[i] == file {
-                return i - 1 < 1  ? filtered[0] : filtered[i - 1]
+                return i - 1 < 0  ? filtered[filtered.count - 1] : filtered[i - 1]
             }
         }
         return ""
