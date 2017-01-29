@@ -76,13 +76,13 @@ class VideoList : UIViewController {
         
     }
     
-    func mediaPlayerNextButtonAction() {
+    @objc fileprivate func mediaPlayerNextButtonAction() {
         if let item = currentPlayer.currentItem {
               replaceVideo(nextVideo(fromFilename: (item.asset as! AVURLAsset).url.lastPathComponent))
         }
     }
     
-    func mediaPlayerPreviousButtonAction() {
+    @objc fileprivate func mediaPlayerPreviousButtonAction() {
         if let item = currentPlayer.currentItem {
             replaceVideo(previousVideo(fromFilename: (item.asset as! AVURLAsset).url.lastPathComponent))
         }
@@ -128,12 +128,14 @@ extension VideoList : UITableViewDelegate {
             NotificationCenter.default.addObserver(self, selector: #selector(self.playerDidFinishPlaying),
                                                    name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: videoPlayer.player!.currentItem)
             videoPlayer.player!.play()
+            AVPlayerViewControllerManager.getForwardButton(videoPlayer).addTarget(self, action: #selector(self.mediaPlayerNextButtonAction), for: .touchUpInside)
+            AVPlayerViewControllerManager.getBackButton(videoPlayer).addTarget(self, action: #selector(self.mediaPlayerPreviousButtonAction), for: .touchUpInside)
         }
     }
     
     @objc private func playerDidFinishPlaying(notification: NSNotification) {
         let url = ((notification.object as! AVPlayerItem).asset as! AVURLAsset).url.lastPathComponent
-        replaceVideo(nextVideo(fromFilename: url))        
+        replaceVideo(nextVideo(fromFilename: url))
     }
     
     fileprivate func replaceVideo(_ fileName: String) {

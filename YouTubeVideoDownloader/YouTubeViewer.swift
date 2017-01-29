@@ -62,7 +62,7 @@ class YouTubeViewer: UIViewController {
         downloadButton.frame = downloadButton.defaultFrame
         downloadButton.frame.origin.y = UIScreen.main.bounds.size.height
         downloadButton.addTarget(self, action: #selector(downloadTapped), for: .touchUpInside)
-        youTubeButton.frame = CGRect(x: 5, y: downloadButton.defaultFrame.origin.y, width: downloadButton.frame.size.width * 0.6, height: downloadButton.frame.size.height)
+        youTubeButton.frame = CGRect(x: 5, y: downloadButton.defaultFrame.origin.y, width: downloadButton.frame.size.width * 0.4, height: downloadButton.frame.size.height)
         youTubeButton.addTarget(self, action: #selector(loadHome), for: .touchUpInside)
         webView.navigationDelegate = self
         view.addSubview(webView)
@@ -101,7 +101,7 @@ class YouTubeViewer: UIViewController {
     
     @objc private func blockAvPlayerViewControllerAutoPlay() {
         if UIApplication.shared.windows.count > 1 && UIApplication.shared.windows[1].isHidden == false {
-            AVPlayerBlocker().blockAvPlayer() //prevent AVPlayerFrom AutoPlaying
+            AVPlayerViewControllerManager().blockAvPlayer() //prevent AVPlayerFrom AutoPlaying
         }
     }
     
