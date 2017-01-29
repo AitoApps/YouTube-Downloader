@@ -25,6 +25,6 @@ final class WKTrafficManager : URLProtocol {
     }
     
     override func startLoading() {}
-    
+        
     override func stopLoading() {}
 }

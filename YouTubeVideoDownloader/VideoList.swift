@@ -11,6 +11,7 @@ import UIKit
 import AVKit
 import AVFoundation
 import AssetsLibrary
+import MediaPlayer
 
 class VideoList : UIViewController {
     
@@ -62,6 +63,25 @@ class VideoList : UIViewController {
         UIApplication.shared.setStatusBarHidden(true, with: .none)        
         appendWithoutAddingDuplicates(videos: try! FileManager.default.contentsOfDirectory(atPath: Literals.rootDirectory.path))
         videoTable.reloadData()
+        
+        // set up handle control center events
+        MPRemoteCommandCenter.shared().nextTrackCommand.isEnabled = true
+        MPRemoteCommandCenter.shared().nextTrackCommand.addTarget(self, action:#selector(mediaPlayerNextButtonAction))
+        MPRemoteCommandCenter.shared().previousTrackCommand.isEnabled = true
+        MPRemoteCommandCenter.shared().previousTrackCommand.addTarget(self, action:#selector(mediaPlayerNextButtonAction))
+
+    }
+    
+    func mediaPlayerNextButtonAction() {
+        if let item = currentPlayer.currentItem {
+              replaceVideo(nextVideo(fromFilename: (item.asset as! AVURLAsset).url.lastPathComponent))
+        }
+    }
+    
+    func mediaPlayerPreviousButtonAction() {
+        if let item = currentPlayer.currentItem {
+            replaceVideo(previousVideo(fromFilename: (item.asset as! AVURLAsset).url.lastPathComponent))
+        }
     }
     
     fileprivate func appendWithoutAddingDuplicates(videos: [String]) {
@@ -98,28 +118,44 @@ extension VideoList : UITableViewDelegate {
         let videoPlayer = AVPlayerViewController()
         currentPlayer = AVPlayer(url: Literals.rootDirectory.appendingPathComponent(name))
         videoPlayer.player = currentPlayer
+        
         present(videoPlayer, animated: true) {
             NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: videoPlayer.player!.currentItem)
             NotificationCenter.default.addObserver(self, selector: #selector(self.playerDidFinishPlaying),
                                                    name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: videoPlayer.player!.currentItem)
             videoPlayer.player!.play()
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = [MPMediaItemPropertyTitle : "foo bar foo"]
         }
     }
     
     @objc private func playerDidFinishPlaying(notification: NSNotification) {
         let url = ((notification.object as! AVPlayerItem).asset as! AVURLAsset).url.lastPathComponent
-        currentPlayer.replaceCurrentItem(with: AVPlayerItem(url: Literals.rootDirectory.appendingPathComponent(nextVideo(fromFilename: url))))
+        replaceVideo(nextVideo(fromFilename: url))
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: currentPlayer!.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.playerDidFinishPlaying),
                                                name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: currentPlayer!.currentItem)
+    }
+    
+    fileprivate func replaceVideo(_ fileName: String) {
+        currentPlayer.replaceCurrentItem(with: AVPlayerItem(url: Literals.rootDirectory.appendingPathComponent(fileName)))
         currentPlayer.play()
     }
     
-    private func nextVideo(fromFilename file: String) -> String {
+    fileprivate func nextVideo(fromFilename file: String) -> String {
         let filtered = videos.filter({ FileManager.default.fileExists(atPath: Literals.rootDirectory.appendingPathComponent($0).path) })
         for var i in 0..<filtered.count {
             if filtered[i] == file {
                 return i + 1 >= filtered.count ? filtered[0] : filtered[i + 1]
+            }
+        }
+        return ""
+    }
+    
+    fileprivate func previousVideo(fromFilename file: String) -> String {
+        let filtered = videos.filter({ FileManager.default.fileExists(atPath: Literals.rootDirectory.appendingPathComponent($0).path) })
+        for var i in 0..<filtered.count {
+            if filtered[i] == file {
+                return i - 1 < 1  ? filtered[0] : filtered[i - 1]
             }
         }
         return ""

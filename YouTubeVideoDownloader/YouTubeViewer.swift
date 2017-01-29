@@ -107,6 +107,21 @@ class YouTubeViewer: UIViewController {
             UIAlertView(title: "Error", message: "Please click on a YouTube Video before trying to download.", delegate: nil, cancelButtonTitle: "OK").show()
         }
     }
+    
+    private lazy var backgroundManager: Alamofire.SessionManager = {
+        let bundleIdentifier = "foobar"
+        return Alamofire.SessionManager(configuration: URLSessionConfiguration.background(withIdentifier: bundleIdentifier + ".background"))
+    }()
+    
+    static let shared = YouTubeViewer()
+    public var backgroundCompletionHandler: (() -> Void)? {
+        get {
+            return backgroundManager.backgroundCompletionHandler
+        }
+        set {
+            backgroundManager.backgroundCompletionHandler = newValue
+        }
+    }
 
     private func initDownload(url: URL, name: String?, imgUrl: URL) {
         let videoName = (name ?? "video\(arc4random_uniform(1000000))") + ".mp4" 
@@ -116,11 +131,11 @@ class YouTubeViewer: UIViewController {
         delegate?.downloadDidBegin(name: path.lastPathComponent, url: imgUrl)
         let notificationView = YTNotificationView(text: "Video has been added to downloads!")
         view.addSubview(notificationView)
-        Alamofire.download(url, method: .get, encoding: URLEncoding.default) { (destroy_stage, response) -> (destinationURL: URL, options: DownloadRequest.DownloadOptions) in
+        backgroundManager.download(url, method: .get, encoding: URLEncoding.default) { (destroy_stage, response) -> (destinationURL: URL, options: DownloadRequest.DownloadOptions) in
                 return (destinationURL: path, options: DownloadRequest.DownloadOptions.removePreviousFile)
-            }.downloadProgress { (progress) in
-                self.delegate?.didReturnCurrentDownload(progress: progress.fractionCompleted, path.lastPathComponent)
-            }
+        }.downloadProgress { (progress) in
+            self.delegate?.didReturnCurrentDownload(progress: progress.fractionCompleted, path.lastPathComponent)
+        }
         
     }
     

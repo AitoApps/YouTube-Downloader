@@ -25,6 +25,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         URLProtocol.wk_registerScheme("https")
         URLProtocol.registerClass(WKTrafficManager.self)
         try! AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+        try! AVAudioSession.sharedInstance().setActive(true)
+        UIApplication.shared.beginReceivingRemoteControlEvents()
         return true
     }
 
@@ -34,6 +36,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+        YouTubeViewer.shared.backgroundCompletionHandler = completionHandler
+    }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
