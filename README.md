@@ -8,4 +8,4 @@ Features:
 * Lock Screen media key support to easily switch between videos
 * Blocks YouTube Ads (may need further testing on this, if someone encounters an ad, please file an issue or let me know)
 * Save any video to camera roll by long-pressing a video
-
+* Delete any video by left-swiping or long-pressing a video
